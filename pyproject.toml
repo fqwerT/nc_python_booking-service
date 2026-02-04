@@ -1,7 +1,7 @@
 [project]
-name = "nc-python-project"
+name = "Сервис для бронирования переговорных комнат"
 version = "0.1.0"
-description = "Add your description here"
+description = "сервис позволяет бронировать переговорные комнаты по переданному промежутку"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
