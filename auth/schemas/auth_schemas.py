@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     email: EmailStr
     full_name: str
     avatar: str | None = None
+    type:str = "user" 
 
 
 class UserCreate(UserBase):
@@ -40,6 +41,7 @@ class UserAuthResponse(BaseModel):
     access_token: str
     refresh_token:str
     token_type: str = "bearer"
+ 
 
 
 class RefreshTokenRequest(BaseModel):

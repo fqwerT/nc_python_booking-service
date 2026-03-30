@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
+from rooms.controller.rooms_controller import router as rooms_router
 from booking.controller.booking_controller import router as booking_router
 from auth.controller.auth_controller import router as auth_router
 
@@ -27,3 +27,4 @@ app.add_middleware(
 
 app.include_router(booking_router, prefix="/bookings", tags=["bookings"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(rooms_router, prefix="/rooms", tags=["rooms"])

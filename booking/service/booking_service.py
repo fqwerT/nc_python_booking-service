@@ -2,7 +2,7 @@ from datetime import timedelta
 from fastapi import HTTPException, status
 from auth.model.auth_model import User
 from booking.repository.booking_repository import BookingRepository
-from booking.schemas.booking_schemas import BookingCreate, BookingResponse
+from booking.schemas.booking_schemas import BookingCreate, BookingResponse, BookingUpdate
 import uuid
 
 class BookingService:
@@ -12,10 +12,24 @@ class BookingService:
 
     def __init__(self, booking_repository: BookingRepository):
         self.booking_repository = booking_repository
-
+    
     def get_bookings(self) -> list[BookingResponse]:
         bookings = self.booking_repository.get_all_bookings()
         return [BookingResponse.model_validate(b) for b in bookings]
+    
+    def get_booking_by_room_id(self,id:str) -> list[BookingResponse]:
+        bookings = self.booking_repository.get_bookings_by_room_ID(id)
+        return [BookingResponse.model_validate(b) for b in bookings]
+    
+    def get_booking_by_user_id(self,id:str) -> list[BookingResponse]:
+        bookings = self.booking_repository.get_bookings_by_user_ID(id)
+        return [BookingResponse.model_validate(b) for b in bookings]
+        
+    def deleteBooking(self,id:str) -> bool:
+        return self.booking_repository.deleteBooking(id)
+    
+    def update_booking(self,booking_update_data:BookingUpdate) -> BookingResponse:
+        return self.booking_repository.update_booking(booking_update_data)
 
     def create_booking(
         self, booking_in: BookingCreate, current_user: User
@@ -44,7 +58,7 @@ class BookingService:
             )
 
         overlapping = self.booking_repository.get_overlapping_bookings(
-            room_number=booking_in.room_number,
+            room_id=booking_in.room_id,
             start=check_in,
             end=check_out,
         )
@@ -57,7 +71,7 @@ class BookingService:
             
         unique_id = str(uuid.uuid4())
         booking = self.booking_repository.create_booking(
-            room_number=booking_in.room_number,
+            room_id=booking_in.room_id,
             guest_name=booking_in.guest_name,
             check_in=check_in,
             check_out=check_out,

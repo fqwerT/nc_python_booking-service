@@ -1,13 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-
 import bcrypt
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
-
 from auth.repository.auth_repository import AuthRepository
 from auth.schemas.auth_schemas import Token, UserCreate, UserLogin, UserRead, UserAuthResponse
 from config import JWT_ALGORITHM, JWT_EXPIRE_MINUTES, JWT_SECRET_KEY
+from auth.utils.avatar_generator.avatar_generator import draw_random_avatar
 import uuid
 
 JWT_EXPIRE_MINUTES = 15                  
@@ -63,12 +62,14 @@ class AuthService:
 
         password_hash = self._hash_password(user_in.password)
         unique_id = str(uuid.uuid4())
+        avatar = draw_random_avatar()
         user = self.auth_repository.create_user(
             email=user_in.email,
             full_name=user_in.full_name,
-            avatar=user_in.avatar or "",
+            avatar=avatar,
             password_hash=password_hash,
-            id=unique_id
+            id=unique_id,
+            type="regular"
          
         )
         access_token = self._create_access_token(subject=user_in.email)
@@ -81,7 +82,7 @@ class AuthService:
 
     def login(self, credentials: UserLogin) -> UserAuthResponse:
         user = self.auth_repository.get_user_by_email(credentials.email)
- 
+        
         if not user or not self._verify_password(
             credentials.password, user.password_hash
         ):
@@ -146,4 +147,17 @@ class AuthService:
             access_token=new_access_token,
             refresh_token=new_refresh_token
         )
+    
+    # def generate_img(self):
+        # width = 300
+        # height = 300 
+        # color = (255,0,0)
+        # image = Image.new("RGB", (width,height),color)
+        # for y in range(height):
+        #     for x in range(width):
+        #         red = (255 * x/width)
+        #         green = 0
+        #         blue = 0
+        #         image.putpixel((x,y),(red,green,blue))
+
 
